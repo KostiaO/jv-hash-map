@@ -28,6 +28,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     @Override
     public V getValue(K key) {
+        if (table == null) {
+            return null;
+        }
+
         int index = hash(key) % capacity;
 
         if (table[index] != null) {
@@ -51,6 +55,15 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void fillMap(K key, V value) {
+        if (key == null) {
+            if (table[0] != null) {
+                table[0].value = value;
+            } else {
+                table[0] = new Node<>(key, value);
+            }
+            return;
+        }
+
         int index = hash(key) % capacity;
 
         if (table[index] != null) {
