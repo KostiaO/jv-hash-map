@@ -19,10 +19,6 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table = new Node[capacity];
         }
 
-        if (++size >= treshold) {
-            resize();
-        }
-
         fillMap(key, value);
     }
 
@@ -32,13 +28,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             return null;
         }
 
-        int index = hash(key) % capacity;
+        int index = getIndex(key);
 
         if (table[index] != null) {
             Node<K, V> node = table[index];
 
             while (node != null) {
-                if (node.key.equals(key)) {
+                if (node.key != null ? node.key.equals(key) : key == null) {
                     return node.value;
                 }
 
@@ -55,22 +51,13 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     }
 
     private void fillMap(K key, V value) {
-        if (key == null) {
-            if (table[0] != null) {
-                table[0].value = value;
-            } else {
-                table[0] = new Node<>(key, value);
-            }
-            return;
-        }
-
-        int index = hash(key) % capacity;
+        int index = getIndex(key);
 
         if (table[index] != null) {
             Node<K, V> node = table[index];
 
             while (node != null) {
-                if (node.key.equals(key)) {
+                if (node.key != null ? node.key.equals(key) : key == null) {
                     node.value = value;
                     return;
                 }
@@ -86,11 +73,16 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         } else {
             table[index] = new Node<>(key, value);
         }
+
+        if (++size >= treshold) {
+            resize();
+        }
     }
 
     private void resize() {
         capacity <<= 1;
         treshold = (int) (capacity * LOAD_FACTOR);
+        size = 0;
 
         Node<K, V>[] oldTableResize = table;
 
@@ -109,6 +101,10 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         }
     }
 
+    private int getIndex(K key) {
+        return key == null ? hash(key) : (hash(key) & 0x7FFFFFFF) % capacity;
+    }
+
     private int hash(Object key) {
         int h;
         return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> capacity);
@@ -123,7 +119,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = key.hashCode();
+            this.hash = key == null ? 0 : key.hashCode();
         }
     }
 }
