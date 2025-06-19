@@ -1,11 +1,11 @@
 package core.basesyntax;
 
 public class MyHashMap<K, V> implements MyMap<K, V> {
-    private static int INITIAL_CAPACITY = 16;
-    private static double LOAD_FACTOR = 0.75;
+    private static final int INITIAL_CAPACITY = 16;
+    private static final double LOAD_FACTOR = 0.75;
 
     private int capacity;
-    private int treshold;
+    private int threshold;
     private int size;
 
     private Node<K, V>[] table;
@@ -14,7 +14,7 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     public void put(K key, V value) {
         if (table == null) {
             capacity = INITIAL_CAPACITY;
-            treshold = (int) (LOAD_FACTOR * capacity);
+            threshold = (int) (LOAD_FACTOR * capacity);
 
             table = new Node[capacity];
         }
@@ -74,14 +74,14 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
             table[index] = new Node<>(key, value);
         }
 
-        if (++size >= treshold) {
+        if (++size >= threshold) {
             resize();
         }
     }
 
     private void resize() {
         capacity <<= 1;
-        treshold = (int) (capacity * LOAD_FACTOR);
+        threshold = (int) (capacity * LOAD_FACTOR);
         size = 0;
 
         Node<K, V>[] oldTableResize = table;
@@ -107,19 +107,17 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
 
     private int hash(Object key) {
         int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> capacity);
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
     }
 
     private static class Node<K, V> {
         private K key;
         private V value;
-        private int hash;
         private Node<K, V> next;
 
         public Node(K key, V value) {
             this.key = key;
             this.value = value;
-            this.hash = key == null ? 0 : key.hashCode();
         }
     }
 }
